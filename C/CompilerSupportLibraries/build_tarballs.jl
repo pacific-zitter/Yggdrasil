@@ -27,11 +27,11 @@ extraction_products = [
 build_info = autobuild(joinpath(@__DIR__, "build", "extraction"),
     "LatestLibraries",
     version,
-    [],
+    FileSource[],
     extraction_script,
     extraction_platforms,
     extraction_products,
-    [];
+    Dependency[];
     skip_audit=true,
     preferred_gcc_version=v"100",
     verbose="--verbose" in ARGS,
@@ -85,7 +85,7 @@ for platform in platforms
     # Find the corresponding source for this platform
     tarball_path, tarball_hash = build_info[BinaryBuilder.abi_agnostic(platform)][1:2]
     sources = [
-        tarball_path => tarball_hash,
+        FileSource(tarball_path, tarball_hash),
     ]
     build_tarballs(ARGS, name, version, sources, script, [platform], products, [])
 end
