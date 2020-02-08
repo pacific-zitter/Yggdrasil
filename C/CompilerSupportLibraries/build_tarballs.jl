@@ -1,4 +1,5 @@
 using BinaryBuilder, SHA
+include("../../fancy_toys.jl")
 
 name = "CompilerSupportLibraries"
 bb_version = BinaryBuilder.get_bb_version()
@@ -19,7 +20,7 @@ for d in /opt/${target}/${target}/lib*; do
 done
 """
 
-extraction_platforms = supported_platforms()
+extraction_platforms = filter(p -> should_build_platform(p), supported_platforms())
 extraction_products = [
     LibraryProduct("libstdc++", :libstdcxx),
     LibraryProduct("libgomp", :libgomp),
@@ -88,12 +89,13 @@ products = [
     LibraryProduct("libgomp", :libgomp),
 ]
 
-# Build the tarballs, and possibly a `build.jl` as well.
 for platform in platforms
-    # Find the corresponding source for this platform
-    tarball_path, tarball_hash = build_info[BinaryBuilder.abi_agnostic(platform)][1:2]
-    sources = [
-        FileSource(tarball_path, tarball_hash),
-    ]
-    build_tarballs(ARGS, name, version, sources, script, [platform], products, [])
+    if should_build_platform(platform)
+        # Find the corresponding source for this platform
+        tarball_path, tarball_hash = build_info[BinaryBuilder.abi_agnostic(platform)][1:2]
+        sources = [
+            FileSource(tarball_path, tarball_hash),
+        ]
+        build_tarballs(ARGS, name, version, sources, script, [platform], products, [])
+    end
 end
