@@ -24,20 +24,25 @@ extraction_products = [
     LibraryProduct("libstdc++", :libstdcxx),
     LibraryProduct("libgomp", :libgomp),
 ]
-build_info = autobuild(joinpath(@__DIR__, "build", "extraction"),
-    "LatestLibraries",
-    version,
-    FileSource[],
-    extraction_script,
-    extraction_platforms,
-    extraction_products,
-    Dependency[];
-    skip_audit=true,
-    preferred_gcc_version=v"100",
-    verbose="--verbose" in ARGS,
-    debug="--debug" in ARGS,
-)
 
+# Don't actually run extraction if we're asking for a JSON, but don't print it either
+if any(startswith(a, "--meta-json") for a in ARGS)
+    build_info = Dict(p => ("./path", "hash") for p in BinaryBuilder.abi_agnostic.(extraction_platforms))
+else
+    build_info = autobuild(joinpath(@__DIR__, "build", "extraction"),
+        "LatestLibraries",
+        version,
+        FileSource[],
+        extraction_script,
+        extraction_platforms,
+        extraction_products,
+        Dependency[];
+        skip_audit=true,
+        preferred_gcc_version=v"100",
+        verbose="--verbose" in ARGS,
+        debug="--debug" in ARGS,
+    )
+end
 
 
 ## Now that we've got those tarballs, we're going to use them as sources to overwrite
