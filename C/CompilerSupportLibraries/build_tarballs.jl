@@ -20,7 +20,7 @@ for d in /opt/${target}/${target}/lib*; do
 done
 """
 
-extraction_platforms = filter(p -> should_build_platform(p), supported_platforms())
+extraction_platforms = supported_platforms()
 extraction_products = [
     LibraryProduct("libstdc++", :libstdcxx),
     LibraryProduct("libgomp", :libgomp),
