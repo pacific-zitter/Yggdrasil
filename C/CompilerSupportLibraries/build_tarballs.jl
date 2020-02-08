@@ -1,4 +1,4 @@
-using BinaryBuilder
+using BinaryBuilder, SHA
 
 name = "CompilerSupportLibraries"
 bb_version = BinaryBuilder.get_bb_version()
@@ -27,7 +27,10 @@ extraction_products = [
 
 # Don't actually run extraction if we're asking for a JSON, but don't print it either
 if any(startswith(a, "--meta-json") for a in ARGS)
-    build_info = Dict(p => ("./path", "hash") for p in BinaryBuilder.abi_agnostic.(extraction_platforms))
+    # How delightfully meta, for when we're calculating the meta!  ;D
+    self_url = @__FILE__
+    self_hash = open(io -> bytes2hex(sha256(io)), self_url)
+    build_info = Dict(p => (self_url, self_hash) for p in BinaryBuilder.abi_agnostic.(extraction_platforms))
 else
     build_info = autobuild(joinpath(@__DIR__, "build", "extraction"),
         "LatestLibraries",
