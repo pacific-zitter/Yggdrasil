@@ -1,6 +1,6 @@
-# Trigger on pushes to `master`
-trigger:
-- master
+# # Trigger on pushes to `master`
+# trigger:
+# - master
 
 # Trigger on PRs against `master`
 pr:
@@ -21,6 +21,8 @@ jobs:
   - bash: |
       # Be fragile, like a beautiful porcelain doll
       set -e
+
+      echo -e '\e[41mHello\e[0m, \e[44mworld\e[0m!'
 
       # Normally we look at the last pushed commit
       COMPARE_AGAINST="HEAD~1"
